@@ -1,8 +1,8 @@
 // Circular buffer
-export { CircularBuffer } from './circular-buffer';
+export { CircularBuffer } from './circular-buffer.js';
 
 // Time-based buffer for replay events
-export { TimeBasedBuffer, type ReplayEvent } from './time-based-buffer';
+export { TimeBasedBuffer, type ReplayEvent } from './time-based-buffer.js';
 
 // PII sanitization patterns
 export {
@@ -17,23 +17,23 @@ export {
   getPatternsByPreset,
   createPatternConfig,
   validatePattern,
-} from './sanitize-patterns';
+} from './sanitize-patterns.js';
 
 // PII sanitizer
 export {
   Sanitizer,
   type SanitizeConfig,
   createSanitizer,
-} from './sanitizer';
+} from './sanitizer.js';
 
 // Deduplication
 export {
   BugReportDeduplicator,
   type DeduplicationConfig,
-} from './deduplicator';
+} from './deduplicator.js';
 
 // Retry with exponential backoff
-export { retryWithBackoff, type RetryConfig } from './retry';
+export { retryWithBackoff, type RetryConfig } from './retry.js';
 
 // URL helpers
 export {
@@ -42,4 +42,4 @@ export {
   stripEndpointSuffix,
   InvalidEndpointError,
   InsecureEndpointError,
-} from './url-helpers';
+} from './url-helpers.js';

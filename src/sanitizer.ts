@@ -7,7 +7,7 @@ import {
   DEFAULT_PATTERNS,
   getPatternsByPriority,
   getAllPatternNames,
-} from './sanitize-patterns';
+} from './sanitize-patterns.js';
 
 export interface SanitizeConfig {
   enabled: boolean;
