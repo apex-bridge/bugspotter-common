@@ -1,0 +1,46 @@
+{
+  "name": "@bugspotter/common",
+  "version": "1.0.0",
+  "description": "Shared utilities for BugSpotter SDK and extension",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "pnpm build"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/apexbridge-tech/bugspotter-common.git"
+  },
+  "bugs": {
+    "url": "https://github.com/apexbridge-tech/bugspotter-common/issues"
+  },
+  "homepage": "https://github.com/apexbridge-tech/bugspotter-common#readme",
+  "author": "Apex Bridge Technology",
+  "license": "MIT",
+  "keywords": [
+    "bugspotter",
+    "utilities",
+    "circular-buffer",
+    "sanitizer",
+    "deduplicator",
+    "retry",
+    "pii"
+  ],
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}
