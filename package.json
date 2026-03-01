@@ -1,6 +1,6 @@
 {
   "name": "@bugspotter/common",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Shared utilities for BugSpotter SDK and extension",
   "type": "module",
   "main": "dist/index.js",

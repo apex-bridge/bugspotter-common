@@ -114,6 +114,14 @@ export class BugReportDeduplicator {
     });
   }
 
+  removeInProgress(
+    title: string,
+    description: string,
+    errorContext?: string,
+  ): void {
+    this.submitting.delete(createFingerprint(title, description, errorContext));
+  }
+
   clear(): void {
     this.recentReports.clear();
     this.submitting.clear();
