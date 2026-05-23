@@ -1,6 +1,6 @@
 {
   "name": "@bugspotter/common",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "Shared utilities for BugSpotter SDK and extension",
   "type": "module",
   "main": "dist/index.js",
@@ -38,7 +38,8 @@
     "sanitizer",
     "deduplicator",
     "retry",
-    "pii"
+    "pii",
+    "deflection"
   ],
   "devDependencies": {
     "typescript": "^5.3.3"
