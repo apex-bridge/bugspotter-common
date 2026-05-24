@@ -199,6 +199,15 @@ export class DeflectionApi {
       const baseUrl = getApiBaseUrl(this.options.endpoint);
       const url = `${baseUrl}/api/v1/sdk/similar`;
       const headers = await this.options.getAuthHeaders();
+      // `getAuthHeaders` is awaitable — the extension reads
+      // `chrome.storage` and can race a fresh cancellation. If the
+      // controller already aborted during that await, skip the
+      // fetch entirely. fetch() with an aborted signal would reject
+      // immediately anyway, but skipping avoids the network-stack
+      // setup and the AbortError trip through our catch.
+      if (controller.signal.aborted) {
+        return [];
+      }
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -221,13 +230,19 @@ export class DeflectionApi {
       }
 
       const data = (await response.json()) as
-        | { success?: boolean; data?: { matches?: DeflectionMatch[] } }
+        | { success?: boolean; data?: { matches?: unknown } }
         | undefined;
-      const matches = data?.data?.matches ?? [];
+      // Validate the shape before slicing — `??` only short-circuits
+      // null/undefined, not "wrong type". A backend that ever
+      // returned `matches` as a string or object would silently
+      // corrupt downstream (`.slice()` on a string returns a string
+      // typed as `DeflectionMatch[]`, and consumers would render
+      // garbage). `Array.isArray` is the right guard.
+      const matches = Array.isArray(data?.data?.matches) ? data.data.matches : [];
       // Defensive: if the backend ever returns more than asked for,
       // clamp client-side. Shouldn't happen, but we never want to
       // flood the widget with chips.
-      return matches.slice(0, this.options.maxMatches);
+      return matches.slice(0, this.options.maxMatches) as DeflectionMatch[];
     } catch (error) {
       // AbortError fires both on timeout and on cancellation by the
       // next debounce tick — both are expected, never an `onError`.
