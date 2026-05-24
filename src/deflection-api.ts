@@ -22,6 +22,8 @@
  * X-API-Key shape, the extension reads from `chrome.storage`.
  */
 
+import { getApiBaseUrl } from './url-helpers.js';
+
 /**
  * Slim match shape returned by `POST /api/v1/sdk/similar`.
  * `canonical_id` is the existing bug a new report could be
@@ -186,7 +188,15 @@ export class DeflectionApi {
     const timeoutId = setTimeout(() => controller.abort(), PROBE_TIMEOUT_MS);
 
     try {
-      const baseUrl = this.options.endpoint.replace(/\/+$/, '');
+      // Use the shared `getApiBaseUrl` helper so the deflection
+      // probe handles the same endpoint shapes the rest of the SDK
+      // already does — including the case where a host passes the
+      // full `/api/v1/reports` URL as the endpoint. Without this,
+      // a naive trailing-slash strip would produce
+      // `…/api/v1/reports/api/v1/sdk/similar` and silently 404.
+      // Throws `InvalidEndpointError` on malformed URLs; the catch
+      // below funnels that through the soft-fail path (returns []).
+      const baseUrl = getApiBaseUrl(this.options.endpoint);
       const url = `${baseUrl}/api/v1/sdk/similar`;
       const headers = await this.options.getAuthHeaders();
       const response = await fetch(url, {
