@@ -94,7 +94,12 @@ export class DeflectionApi {
       endpoint: options.endpoint,
       getAuthHeaders: options.getAuthHeaders,
       debounceMs: options.debounceMs ?? DEFAULT_DEBOUNCE_MS,
-      maxMatches: options.maxMatches ?? DEFAULT_MAX_MATCHES,
+      // Clamp to a positive integer. A negative value (e.g. -1
+      // passed by a misconfigured consumer) would otherwise reach
+      // `slice(0, -1)` which silently returns all-but-last-1 items
+      // — wrong count, no error surface. Math.max keeps things
+      // sensible without needing a separate validation step.
+      maxMatches: Math.max(1, options.maxMatches ?? DEFAULT_MAX_MATCHES),
       onError: options.onError ?? (() => {}),
     };
   }
@@ -333,11 +338,21 @@ export function statusLabel(status: string, t?: (key: string) => string): string
     return typeof status === 'string' ? status : '';
   }
   if (t) {
-    const translated = t(`bugspotter.status.${key}`);
-    if (translated) {
-      return translated;
+    // Translator is host-supplied external code; the "never throws"
+    // contract has to hold even if the host's i18n system blows up
+    // (e.g. i18next with a missing namespace, lazy-loaded bundle
+    // that failed to fetch). Wrap defensively — any throw falls
+    // back to the English default rather than propagating to the
+    // widget render path.
+    try {
+      const translated = t(`bugspotter.status.${key}`);
+      if (translated) {
+        return translated;
+      }
+      // Translator returned empty/falsy → graceful fallback.
+    } catch {
+      // Fall through to default.
     }
-    // Translator returned empty/falsy → graceful fallback.
   }
   return DEFAULT_STATUS_LABELS[key];
 }
