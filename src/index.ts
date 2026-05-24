@@ -43,3 +43,13 @@ export {
   InvalidEndpointError,
   InsecureEndpointError,
 } from './url-helpers.js';
+
+// SDK / extension deflection (similarity probe before bug submission)
+export {
+  DeflectionApi,
+  statusLabel,
+  canonicalStatusKey,
+  type DeflectionMatch,
+  type DeflectionApiOptions,
+  type StatusLabelKey,
+} from './deflection-api.js';
