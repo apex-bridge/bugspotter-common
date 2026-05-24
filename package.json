@@ -1,6 +1,6 @@
 {
   "name": "@bugspotter/common",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Shared utilities for BugSpotter SDK and extension",
   "type": "module",
   "main": "dist/index.js",
@@ -23,12 +23,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/apexbridge-tech/bugspotter-common.git"
+    "url": "https://github.com/apex-bridge/bugspotter-common.git"
   },
   "bugs": {
-    "url": "https://github.com/apexbridge-tech/bugspotter-common/issues"
+    "url": "https://github.com/apex-bridge/bugspotter-common/issues"
   },
-  "homepage": "https://github.com/apexbridge-tech/bugspotter-common#readme",
+  "homepage": "https://github.com/apex-bridge/bugspotter-common#readme",
   "author": "Apex Bridge Technology",
   "license": "MIT",
   "keywords": [
