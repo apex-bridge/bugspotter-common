@@ -48,6 +48,8 @@ export {
 export {
   DeflectionApi,
   statusLabel,
+  canonicalStatusKey,
   type DeflectionMatch,
   type DeflectionApiOptions,
+  type StatusLabelKey,
 } from './deflection-api.js';

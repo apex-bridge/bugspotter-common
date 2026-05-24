@@ -263,33 +263,81 @@ export class DeflectionApi {
 }
 
 /**
- * Map intelligence status strings to short user-friendly labels.
- * Keeps the label set small and predictable so when localisation
- * lands, each consumer only translates a handful of strings rather
- * than handling arbitrary status values from the backend.
+ * Stable label keys returned by `canonicalStatusKey`. Consumers
+ * with i18n wire these into their translation tables (e.g. the
+ * admin app's `bugspotter.status.in_progress`); consumers without
+ * i18n use the English defaults via `statusLabel`.
  */
-export function statusLabel(status: string): string {
-  // Defensive guard: `status` is typed as string, but this module's
-  // "never throws" stance has to hold even when the backend returns
-  // an unexpected shape (null / undefined / number from a future
-  // API version). `.toLowerCase()` on a non-string throws — short-
-  // circuit before we touch it.
+export type StatusLabelKey = 'open' | 'in_progress' | 'closed' | 'wont_fix';
+
+/**
+ * Normalise an arbitrary backend status string to one of the four
+ * known keys, or `null` if it doesn't match. Lets a consumer
+ * branch on the canonical form without re-implementing the alias
+ * map (hyphenated vs underscored, `closed` vs `resolved`, etc).
+ */
+export function canonicalStatusKey(status: string): StatusLabelKey | null {
   if (typeof status !== 'string' || status.length === 0) {
-    return '';
+    return null;
   }
   switch (status.toLowerCase()) {
     case 'open':
-      return 'Open';
+      return 'open';
     case 'in_progress':
     case 'in-progress':
-      return 'In progress';
+      return 'in_progress';
     case 'closed':
     case 'resolved':
-      return 'Fixed';
+      return 'closed';
     case 'wont_fix':
+    case 'wont-fix':
     case 'wontfix':
-      return 'Won’t fix';
+      return 'wont_fix';
     default:
-      return status;
+      return null;
   }
+}
+
+/** English default labels per canonical key. */
+const DEFAULT_STATUS_LABELS: Record<StatusLabelKey, string> = {
+  open: 'Open',
+  in_progress: 'In progress',
+  closed: 'Fixed',
+  wont_fix: 'Won’t fix',
+};
+
+/**
+ * Map intelligence status strings to short user-friendly labels.
+ *
+ * `t` is an optional translator hook so the SDK / extension /
+ * admin apps that already have i18n wired (en/ru/kk) can render
+ * localised labels without forking this function. When `t` is
+ * supplied, it's called with a stable key of the form
+ * `'bugspotter.status.<canonical>'` (e.g. `'bugspotter.status.in_progress'`).
+ * A falsy / empty return from `t` falls back to the English default,
+ * so partial translation coverage degrades gracefully.
+ *
+ * Without `t`, returns the English default. Unknown statuses pass
+ * through verbatim — the backend may add new values that consumers
+ * understand before this library does.
+ *
+ * Defensive: `status` is typed string but the module's "never throws"
+ * contract has to hold even when the backend returns an unexpected
+ * shape (null / undefined / number from a future API version).
+ */
+export function statusLabel(status: string, t?: (key: string) => string): string {
+  const key = canonicalStatusKey(status);
+  if (key === null) {
+    // Unknown status — pass through the original (already string-
+    // guarded by canonicalStatusKey). Empty for non-strings.
+    return typeof status === 'string' ? status : '';
+  }
+  if (t) {
+    const translated = t(`bugspotter.status.${key}`);
+    if (translated) {
+      return translated;
+    }
+    // Translator returned empty/falsy → graceful fallback.
+  }
+  return DEFAULT_STATUS_LABELS[key];
 }
