@@ -24,7 +24,10 @@ export interface PatternDefinition {
 export const DEFAULT_PATTERNS: Record<PIIPatternName, PatternDefinition> = {
   email: {
     name: 'email',
-    regex: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g,
+    // Lookbehind instead of a leading \b, and dot-separated domain labels,
+    // keep this linear: the old form backtracked quadratically on runs like
+    // "a.a.a." and froze the main thread on large page text.
+    regex: /(?<![A-Za-z0-9._%+-])[A-Za-z0-9._%+-]+@(?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,}\b/g,
     description: 'Email addresses',
     priority: 1,
   },
